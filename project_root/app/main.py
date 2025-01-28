@@ -1,7 +1,8 @@
+# app/main.py
 from fastapi import FastAPI
 from app.routers.users import router as users_router
 from app.routers.auth import router as auth_router
-from app.database import engine, Base
+from app.database import init_db
 import os
 from dotenv import load_dotenv
 
@@ -9,7 +10,7 @@ load_dotenv()
 
 API_PORT = os.getenv("API_PORT")
 
-Base.metadata.create_all(bind=engine)
+init_db()
 
 app = FastAPI()
 

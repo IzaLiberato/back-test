@@ -21,3 +21,17 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 def list_users(db: Session = Depends(get_db), admin_user=Depends(get_admin_user)):
     return get_users(db)
 
+@router.put("/promote/{user_id}", summary="Promover usuário a administrador", description="Este endpoint só pode ser acessado por administradores.")
+def promote_user(user_id: int, db: Session = Depends(get_db), admin_user: User = Depends(get_admin_user)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+    
+    if user.is_admin:
+        raise HTTPException(status_code=400, detail="O usuário já é um administrador.")
+
+    user.is_admin = True
+    db.commit()
+    db.refresh(user)
+
+    return {"msg": f"Usuário {user.email} promovido a administrador."}
